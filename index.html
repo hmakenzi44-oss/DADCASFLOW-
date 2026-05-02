@@ -84,7 +84,15 @@ body {
 </div>
 
 <!-- SALES -->
-<div id="sales" class="page">
+<div {
+  id: 17123456789,
+  items: [
+    { name, quantity, sell_price, buy_price, total }
+  ],
+  total: 50000,
+  profit: 12000,
+  date: "2026-05-02T10:00:00"
+}
   <h2>Sales</h2>
 
   <select id="productSelect"></select>
@@ -265,7 +273,7 @@ function renderDropdown() {
     select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
   });
 }
-  function renderSalesHistory() {
+function renderSalesHistory() {
   let list = document.getElementById("salesList");
   list.innerHTML = "";
 
@@ -274,18 +282,27 @@ function renderDropdown() {
   let total = 0;
   let profit = 0;
 
-  sales.forEach(s => {
-    let saleDate = new Date(s.date).toISOString().split("T")[0];
+  sales.forEach(t => {
+
+    let saleDate = new Date(t.date).toISOString().split("T")[0];
 
     if (!filterDate || saleDate === filterDate) {
 
-      total += s.total;
-      profit += s.profit;
+      total += t.total;
+      profit += t.profit;
+
+      let itemsHTML = "";
+
+      t.items.forEach(i => {
+        itemsHTML += `${i.name} x${i.quantity} = ${i.total}<br>`;
+      });
 
       list.innerHTML += `
         <li>
-          ${s.name} x${s.quantity} = ${s.total} <br>
-          Profit: ${s.profit} <br>
+          <b>Receipt #${t.id}</b><br>
+          ${itemsHTML}
+          Total: ${t.total}<br>
+          Profit: ${t.profit}<br>
           Date: ${saleDate}
         </li>
       `;
@@ -294,7 +311,7 @@ function renderDropdown() {
 
   document.getElementById("historyTotal").innerText = total;
   document.getElementById("historyProfit").innerText = profit;
-  }
+}
 
 /* ADD TO CART */
 function addToCart() {
@@ -338,18 +355,31 @@ function renderCart() {
 
 /* COMPLETE SALE */
 function completeSale() {
-  cart.forEach(item => {
-    let profit = (item.sell_price - item.buy_price) * item.quantity;
+  if (cart.length === 0) {
+    alert("Cart is empty");
+    return;
+  }
 
-    sales.push({
-      ...item,
-      profit: profit,
-      date: new Date()
-    });
+  let total = 0;
+  let profit = 0;
+
+  cart.forEach(item => {
+    total += item.total;
+    profit += (item.sell_price - item.buy_price) * item.quantity;
 
     let product = products.find(p => p.id === item.id);
     product.quantity -= item.quantity;
   });
+
+  let transaction = {
+    id: Date.now(),
+    items: [...cart],
+    total: total,
+    profit: profit,
+    date: new Date()
+  };
+
+  sales.push(transaction);
 
   saveSales();
   saveProducts();
@@ -358,6 +388,7 @@ function completeSale() {
   renderCart();
   renderProducts();
   updateDashboard();
+  renderSalesHistory();
 }
 
 /* DASHBOARD */
@@ -367,10 +398,10 @@ function updateDashboard() {
   let todaySales = 0;
   let todayProfit = 0;
 
-  sales.forEach(s => {
-    if (new Date(s.date).toDateString() === today) {
-      todaySales += s.total;
-      todayProfit += s.profit;
+  sales.forEach(t => {
+    if (new Date(t.date).toDateString() === today) {
+      todaySales += t.total;
+      todayProfit += t.profit;
     }
   });
 
@@ -380,7 +411,6 @@ function updateDashboard() {
   document.getElementById("lowStock").innerText =
     products.filter(p => p.quantity < 5).length;
 }
-
 /* INIT */
 renderProducts();
 renderDropdown();
