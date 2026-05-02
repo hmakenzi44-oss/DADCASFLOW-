@@ -3,18 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>DADCAS BUSINESS</title>
 
 <style>
-<body> {
+body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #121212;
   color: white;
 }
 
-/* Pages */
 .page {
   display: none;
   padding: 15px;
@@ -24,7 +22,6 @@
   display: block;
 }
 
-/* Bottom Nav */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -42,7 +39,6 @@
   font-weight: bold;
 }
 
-/* Cards */
 .card {
   background: #1e1e1e;
   padding: 15px;
@@ -50,7 +46,6 @@
   border-radius: 10px;
 }
 
-/* More Menu */
 .more-menu {
   position: fixed;
   bottom: 60px;
@@ -78,11 +73,10 @@
 </head>
 
 <body>
-  
+
 <!-- DASHBOARD -->
 <div id="home" class="page active">
   <h2>Dashboard</h2>
-
   <div class="card">Today's Sales: <span id="todaySales">0</span></div>
   <div class="card">Today's Profit: <span id="todayProfit">0</span></div>
   <div class="card">Total Products: <span id="totalProducts">0</span></div>
@@ -123,7 +117,6 @@
 <!-- MORE MENU -->
 <div id="moreMenu" class="more-menu hidden">
   <h3>More</h3>
-
   <button onclick="openReports()">Reports</button>
   <button onclick="openEmployees()">Employees</button>
   <button onclick="openBusiness()">Business</button>
@@ -146,10 +139,20 @@ let products = JSON.parse(localStorage.getItem("products")) || [];
 let sales = JSON.parse(localStorage.getItem("sales")) || [];
 let cart = [];
 
+/* SAVE */
+function saveProducts() {
+  localStorage.setItem("products", JSON.stringify(products));
+}
+
+function saveSales() {
+  localStorage.setItem("sales", JSON.stringify(sales));
+}
+
 /* NAVIGATION */
 function showPage(page) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(page).classList.add("active");
+  document.getElementById("moreMenu").classList.add("hidden");
 }
 
 /* MORE MENU */
@@ -164,8 +167,13 @@ function openBusiness(){ alert("Business module"); }
 function openAdmin(){ alert("Admin panel"); }
 function openSubscriptions(){ alert("Subscriptions"); }
 
-/* PRODUCTS */
+/* ADD PRODUCT */
 function addProduct() {
+  if (!pname.value || buy.value <= 0 || sell.value <= 0 || qty.value <= 0) {
+    alert("Invalid input");
+    return;
+  }
+
   let product = {
     id: Date.now(),
     name: pname.value,
@@ -173,14 +181,10 @@ function addProduct() {
     sell_price: Number(sell.value),
     quantity: Number(qty.value)
   };
-function saveProducts() {
-  localStorage.setItem("products", JSON.stringify(products));
-}
 
-function saveSales() {
-  localStorage.setItem("sales", JSON.stringify(sales));
-}
   products.push(product);
+  saveProducts();
+
   renderProducts();
   renderDropdown();
   updateDashboard();
@@ -206,22 +210,29 @@ function renderDropdown() {
   });
 }
 
-/* CART */
-function addProduct() {
-  let product = {
-    id: Date.now(),
-    name: pname.value,
-    buy_price: Number(buy.value),
-    sell_price: Number(sell.value),
-    quantity: Number(qty.value)
+/* ADD TO CART */
+function addToCart() {
+  let productId = Number(productSelect.value);
+  let qty = Number(quantity.value);
+
+  let product = products.find(p => p.id === productId);
+
+  if (!product || qty <= 0 || qty > product.quantity) {
+    alert("Invalid quantity");
+    return;
+  }
+
+  let item = {
+    id: product.id,
+    name: product.name,
+    quantity: qty,
+    sell_price: product.sell_price,
+    buy_price: product.buy_price,
+    total: product.sell_price * qty
   };
 
-  products.push(product);
-  saveProducts();
-
-  renderProducts();
-  renderDropdown();
-  updateDashboard();
+  cart.push(item);
+  renderCart();
 }
 
 /* RENDER CART */
@@ -242,7 +253,6 @@ function renderCart() {
 /* COMPLETE SALE */
 function completeSale() {
   cart.forEach(item => {
-
     let profit = (item.sell_price - item.buy_price) * item.quantity;
 
     sales.push({
@@ -253,22 +263,6 @@ function completeSale() {
 
     let product = products.find(p => p.id === item.id);
     product.quantity -= item.quantity;
-
-  });
-  function completeSale() {
-  cart.forEach(item => {
-
-    let profit = (item.sell_price - item.buy_price) * item.quantity;
-
-    sales.push({
-      ...item,
-      profit: profit,
-      date: new Date()
-    });
-
-    let product = products.find(p => p.id === item.id);
-    product.quantity -= item.quantity;
-
   });
 
   saveSales();
@@ -278,17 +272,10 @@ function completeSale() {
   renderCart();
   renderProducts();
   updateDashboard();
-  }
-
-  cart = [];
-  renderCart();
-  renderProducts();
-  updateDashboard();
 }
 
 /* DASHBOARD */
 function updateDashboard() {
-
   let today = new Date().toDateString();
 
   let todaySales = 0;
@@ -307,9 +294,12 @@ function updateDashboard() {
   document.getElementById("lowStock").innerText =
     products.filter(p => p.quantity < 5).length;
 }
+
+/* INIT */
 renderProducts();
 renderDropdown();
 updateDashboard();
+
 </script>
 
 </body>
