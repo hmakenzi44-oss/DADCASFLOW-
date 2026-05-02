@@ -1,296 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MeKsah Part</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Login - MeKsah Part</title>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="logo">VERITAS</div>
-  <div class="menu-icon" onclick="toggleMenu()">☰</div>
-</header>
+<h2>Admin Login</h2>
 
-<nav id="sidebar" class="sidebar">
-  <ul>
-    <li>Home</li>
-    <li>About Us</li>
-    <li>Services</li>
-    <li>Logistics</li>
-    <li>Our Products</li>
-    <li>Contacts</li>
-    <li>Gallery</li>
-    <li class="lang">🇬🇧 English ▼</li>
-  </ul>
-</nav>
+<input id="email" placeholder="Email"><br><br>
+<input id="password" type="password" placeholder="Password"><br><br>
 
-<section class="hero">
-  <div class="logo-box">
-    <img src="https://via.placeholder.com/120" alt="logo">
-    <h1>VERITAS</h1>
-    <p>TRUST PRODUCTS FRIM MeKsah Part.</p>
-  </div>
+<button onclick="login()">Login</button>
 
-  <div class="content">
-    <p>
-      MeKsah will deal with selling building materials and auto Spare parts.
-    </p>
-  </div>
-</section>
-
-<script src="script.js"></script>
-</body>
-</html>  flex: 1;
-  padding: 15px;
-  border: none;
-  background: none;
-  color: white;
-  font-weight: bold;
-}
-
-/* Cards */
-.card {
-  background: #1e1e1e;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-}
-
-/* More Menu */
-.more-menu {
-  position: fixed;
-  bottom: 60px;
-  left: 0;
-  right: 0;
-  background: #1e1e1e;
-  padding: 15px;
-  border-radius: 15px 15px 0 0;
-}
-
-.more-menu button {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  background: orange;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-}
-
-.hidden {
-  display: none;
-}
-</style>
-</head>
-
-<body>
-
-<!-- DASHBOARD -->
-<div id="home" class="page active">
-  <h2>Dashboard</h2>
-
-  <div class="card">Today's Sales: <span id="todaySales">0</span></div>
-  <div class="card">Today's Profit: <span id="todayProfit">0</span></div>
-  <div class="card">Total Products: <span id="totalProducts">0</span></div>
-  <div class="card">Low Stock: <span id="lowStock">0</span></div>
-</div>
-
-<!-- SALES -->
-<div id="sales" class="page">
-  <h2>Sales</h2>
-
-  <select id="productSelect"></select>
-  <input type="number" id="quantity" placeholder="Quantity" />
-
-  <button onclick="addToCart()">Add to Cart</button>
-
-  <h3>Cart</h3>
-  <ul id="cartList"></ul>
-
-  <h3>Total: <span id="totalAmount">0</span></h3>
-
-  <button onclick="completeSale()">Complete Sale</button>
-</div>
-
-<!-- STOCKS -->
-<div id="stocks" class="page">
-  <h2>Stocks</h2>
-
-  <input id="pname" placeholder="Product Name">
-  <input id="buy" placeholder="Buy Price" type="number">
-  <input id="sell" placeholder="Sell Price" type="number">
-  <input id="qty" placeholder="Quantity" type="number">
-
-  <button onclick="addProduct()">Add Product</button>
-
-  <ul id="productList"></ul>
-</div>
-
-<!-- MORE MENU -->
-<div id="moreMenu" class="more-menu hidden">
-  <h3>More</h3>
-
-  <button onclick="openReports()">Reports</button>
-  <button onclick="openEmployees()">Employees</button>
-  <button onclick="openBusiness()">Business</button>
-  <button onclick="openAdmin()">Admin</button>
-  <button onclick="openSubscriptions()">Subscriptions</button>
-</div>
-
-<!-- NAV -->
-<div class="bottom-nav">
-  <button onclick="showPage('home')">Home</button>
-  <button onclick="showPage('sales')">Sales</button>
-  <button onclick="showPage('stocks')">Stocks</button>
-  <button onclick="toggleMore()">More</button>
-</div>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
 
 <script>
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT"
+};
 
-/* DATA */
-let products = [];
-let sales = [];
-let cart = [];
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-/* NAVIGATION */
-function showPage(page) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(page).classList.add("active");
+function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      window.location = "admin.html";
+    })
+    .catch(err => alert(err.message));
 }
-
-/* MORE MENU */
-function toggleMore() {
-  document.getElementById("moreMenu").classList.toggle("hidden");
-}
-
-/* PLACEHOLDER MODULES */
-function openReports(){ alert("Reports coming"); }
-function openEmployees(){ alert("Employees coming"); }
-function openBusiness(){ alert("Business module"); }
-function openAdmin(){ alert("Admin panel"); }
-function openSubscriptions(){ alert("Subscriptions"); }
-
-/* PRODUCTS */
-function addProduct() {
-  let product = {
-    id: Date.now(),
-    name: pname.value,
-    buy_price: Number(buy.value),
-    sell_price: Number(sell.value),
-    quantity: Number(qty.value)
-  };
-
-  products.push(product);
-  renderProducts();
-  renderDropdown();
-  updateDashboard();
-}
-
-/* RENDER PRODUCTS */function renderProducts() {
-  let list = document.getElementById("productList");
-  list.innerHTML = "";
-
-  products.forEach(p => {
-    list.innerHTML += `
-      <li>
-        ${p.name} - ${p.quantity} 
-        <button onclick="editProduct(${p.id})">Edit</button>
-        <button onclick="deleteProduct(${p.id})">Delete</button>
-      </li>
-    `;
-  });
-}
-
-
-/* DROPDOWN */
-function renderDropdown() {
-  let select = document.getElementById("productSelect");
-  select.innerHTML = "";
-
-  products.forEach(p => {
-    select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-  });
-}
-
-/* CART */
-function addToCart() {
-  let id = Number(productSelect.value);
-  let qtyVal = Number(quantity.value);
-
-  let product = products.find(p => p.id === id);
-
-  let item = {
-    ...product,
-    quantity: qtyVal,
-    total: product.sell_price * qtyVal
-  };
-
-  cart.push(item);
-  renderCart();
-}
-
-/* RENDER CART */
-function renderCart() {
-  let list = document.getElementById("cartList");
-  list.innerHTML = "";
-
-  let total = 0;
-
-  cart.forEach(c => {
-    total += c.total;
-    list.innerHTML += `<li>${c.name} x${c.quantity} = ${c.total}</li>`;
-  });
-
-  totalAmount.innerText = total;
-}
-
-/* COMPLETE SALE */
-function completeSale() {
-  cart.forEach(item => {
-
-    let profit = (item.sell_price - item.buy_price) * item.quantity;
-
-    sales.push({
-      ...item,
-      profit: profit,
-      date: new Date()
-    });
-
-    let product = products.find(p => p.id === item.id);
-    product.quantity -= item.quantity;
-
-  });
-
-  cart = [];
-  renderCart();
-  renderProducts();
-  updateDashboard();
-}
-
-/* DASHBOARD */
-function updateDashboard() {
-
-  let today = new Date().toDateString();
-
-  let todaySales = 0;
-  let todayProfit = 0;
-
-  sales.forEach(s => {
-    if (new Date(s.date).toDateString() === today) {
-      todaySales += s.total;
-      todayProfit += s.profit;
-    }
-  });
-
-  document.getElementById("todaySales").innerText = todaySales;
-  document.getElementById("todayProfit").innerText = todayProfit;
-  document.getElementById("totalProducts").innerText = products.length;
-  document.getElementById("lowStock").innerText =
-    products.filter(p => p.quantity < 5).length;
-}
-
 </script>
 
 </body>
