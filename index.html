@@ -112,6 +112,17 @@ body {
   <button onclick="addProduct()">Add Product</button>
 
   <ul id="productList"></ul>
+  <!-- SALES HISTORY -->
+<div id="history" class="page">
+  <h2>Sales History</h2>
+
+  <input type="date" id="filterDate" onchange="renderSalesHistory()">
+
+  <ul id="salesList"></ul>
+
+  <h3>Total Sales: <span id="historyTotal">0</span></h3>
+  <h3>Total Profit: <span id="historyProfit">0</span></h3>
+</div>
 </div>
 
 <!-- MORE MENU -->
@@ -129,7 +140,13 @@ body {
   <button onclick="showPage('home')">Home</button>
   <button onclick="showPage('sales')">Sales</button>
   <button onclick="showPage('stocks')">Stocks</button>
+  <button onclick="toggleMore()">More</button><div class="bottom-nav">
+  <button onclick="showPage('home')">Home</button>
+  <button onclick="showPage('sales')">Sales</button>
+  <button onclick="showPage('stocks')">Stocks</button>
+  <button onclick="showPage('history')">History</button>
   <button onclick="toggleMore()">More</button>
+  </div>
 </div>
 
 <script>
@@ -248,6 +265,36 @@ function renderDropdown() {
     select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
   });
 }
+  function renderSalesHistory() {
+  let list = document.getElementById("salesList");
+  list.innerHTML = "";
+
+  let filterDate = document.getElementById("filterDate").value;
+
+  let total = 0;
+  let profit = 0;
+
+  sales.forEach(s => {
+    let saleDate = new Date(s.date).toISOString().split("T")[0];
+
+    if (!filterDate || saleDate === filterDate) {
+
+      total += s.total;
+      profit += s.profit;
+
+      list.innerHTML += `
+        <li>
+          ${s.name} x${s.quantity} = ${s.total} <br>
+          Profit: ${s.profit} <br>
+          Date: ${saleDate}
+        </li>
+      `;
+    }
+  });
+
+  document.getElementById("historyTotal").innerText = total;
+  document.getElementById("historyProfit").innerText = profit;
+  }
 
 /* ADD TO CART */
 function addToCart() {
@@ -338,6 +385,7 @@ function updateDashboard() {
 renderProducts();
 renderDropdown();
 updateDashboard();
+  renderSalesHistory();
 
 </script>
 
