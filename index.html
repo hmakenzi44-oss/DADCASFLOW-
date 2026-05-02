@@ -1,40 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MeKsah Part</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-<title>DADCAS BUSINESS</title>
+<header class="topbar">
+  <div class="logo">VERITAS</div>
+  <div class="menu-icon" onclick="toggleMenu()">☰</div>
+</header>
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #121212;
-  color: white;
-}
+<nav id="sidebar" class="sidebar">
+  <ul>
+    <li>Home</li>
+    <li>About Us</li>
+    <li>Services</li>
+    <li>Logistics</li>
+    <li>Our Products</li>
+    <li>Contacts</li>
+    <li>Gallery</li>
+    <li class="lang">🇬🇧 English ▼</li>
+  </ul>
+</nav>
 
-/* Pages */
-.page {
-  display: none;
-  padding: 15px;
-}
+<section class="hero">
+  <div class="logo-box">
+    <img src="https://via.placeholder.com/120" alt="logo">
+    <h1>VERITAS</h1>
+    <p>TRUST THE SCIENCE, GROW WITH VERITAS.</p>
+  </div>
 
-.active {
-  display: block;
-}
+  <div class="content">
+    <p>
+      Veritas Agroscience Investment Ltd is a dynamic company engaged in the importation,
+      manufacturing, and distribution of high-quality veterinary supplements and pharmaceutical products.
+    </p>
+  </div>
+</section>
 
-/* Bottom Nav */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  display: flex;
-  background: #1e1e1e;
-}
-
-.bottom-nav button {
-  flex: 1;
+<script src="script.js"></script>
+</body>
+</html>  flex: 1;
   padding: 15px;
   border: none;
   background: none;
