@@ -142,8 +142,8 @@ body {
 <script>
 
 /* DATA */
-let products = [];
-let sales = [];
+let products = JSON.parse(localStorage.getItem("products")) || [];
+let sales = JSON.parse(localStorage.getItem("sales")) || [];
 let cart = [];
 
 /* NAVIGATION */
@@ -173,7 +173,13 @@ function addProduct() {
     sell_price: Number(sell.value),
     quantity: Number(qty.value)
   };
+function saveProducts() {
+  localStorage.setItem("products", JSON.stringify(products));
+}
 
+function saveSales() {
+  localStorage.setItem("sales", JSON.stringify(sales));
+}
   products.push(product);
   renderProducts();
   renderDropdown();
@@ -201,20 +207,21 @@ function renderDropdown() {
 }
 
 /* CART */
-function addToCart() {
-  let id = Number(productSelect.value);
-  let qtyVal = Number(quantity.value);
-
-  let product = products.find(p => p.id === id);
-
-  let item = {
-    ...product,
-    quantity: qtyVal,
-    total: product.sell_price * qtyVal
+function addProduct() {
+  let product = {
+    id: Date.now(),
+    name: pname.value,
+    buy_price: Number(buy.value),
+    sell_price: Number(sell.value),
+    quantity: Number(qty.value)
   };
 
-  cart.push(item);
-  renderCart();
+  products.push(product);
+  saveProducts();
+
+  renderProducts();
+  renderDropdown();
+  updateDashboard();
 }
 
 /* RENDER CART */
@@ -248,6 +255,30 @@ function completeSale() {
     product.quantity -= item.quantity;
 
   });
+  function completeSale() {
+  cart.forEach(item => {
+
+    let profit = (item.sell_price - item.buy_price) * item.quantity;
+
+    sales.push({
+      ...item,
+      profit: profit,
+      date: new Date()
+    });
+
+    let product = products.find(p => p.id === item.id);
+    product.quantity -= item.quantity;
+
+  });
+
+  saveSales();
+  saveProducts();
+
+  cart = [];
+  renderCart();
+  renderProducts();
+  updateDashboard();
+  }
 
   cart = [];
   renderCart();
@@ -276,7 +307,9 @@ function updateDashboard() {
   document.getElementById("lowStock").innerText =
     products.filter(p => p.quantity < 5).length;
 }
-
+renderProducts();
+renderDropdown();
+updateDashboard();
 </script>
 
 </body>
