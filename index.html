@@ -196,9 +196,48 @@ function renderProducts() {
   list.innerHTML = "";
 
   products.forEach(p => {
-    list.innerHTML += `<li>${p.name} - ${p.quantity}</li>`;
+    list.innerHTML += `
+      <li>
+        ${p.name} - ${p.quantity} 
+        <button onclick="editProduct(${p.id})">Edit</button>
+        <button onclick="deleteProduct(${p.id})">Delete</button>
+      </li>
+    `;
   });
 }
+  function deleteProduct(id) {
+  if (!confirm("Delete this product?")) return;
+
+  products = products.filter(p => p.id !== id);
+
+  saveProducts();
+  renderProducts();
+  renderDropdown();
+  updateDashboard();
+  }
+  function editProduct(id) {
+  let product = products.find(p => p.id === id);
+
+  let newName = prompt("Product Name", product.name);
+  let newBuy = prompt("Buy Price", product.buy_price);
+  let newSell = prompt("Sell Price", product.sell_price);
+  let newQty = prompt("Quantity", product.quantity);
+
+  if (!newName || newBuy <= 0 || newSell <= 0 || newQty < 0) {
+    alert("Invalid input");
+    return;
+  }
+
+  product.name = newName;
+  product.buy_price = Number(newBuy);
+  product.sell_price = Number(newSell);
+  product.quantity = Number(newQty);
+
+  saveProducts();
+  renderProducts();
+  renderDropdown();
+  updateDashboard();
+  }
 
 /* DROPDOWN */
 function renderDropdown() {
