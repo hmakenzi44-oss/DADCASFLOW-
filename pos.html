@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>POS | MAKSAH System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>MAKSAH POS</h2>
+        <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a href="pos.html" class="nav-link active"><i class="fas fa-cash-register"></i> Sales</a>
+        <a href="inventory.html" class="nav-link"><i class="fas fa-boxes"></i> Inventory</a>
+        <button onclick="toggleDarkMode()" class="nav-link" style="background:none; border:none; width:100%; text-align:left; cursor:pointer;">
+            <i class="fas fa-moon"></i> Dark Mode
+        </button>
+    </div>
+
+    <main class="main-content">
+        <div class="top-bar">
+            <h1>Point of Sale</h1>
+            <div id="user-info">Cashier: <b id="cashier-name">Admin</b></div>
+        </div>
+
+        <div class="pos-container">
+            <div class="products-selection">
+                <input type="text" id="productSearch" placeholder="Search product name or SKU..." onkeyup="filterProducts()">
+                <div class="stats-grid" id="productGrid" style="margin-top:20px;">
+                    </div>
+            </div>
+
+            <div class="cart-area">
+                <h3>Current Order</h3>
+                <div id="cartItems" style="flex:1; overflow-y:auto;"></div>
+                <div class="cart-summary">
+                    <hr>
+                    <h4>Total: ZMW <span id="cartTotal">0.00</span></h4>
+                    <button class="btn-pay" onclick="processSale()">Complete Sale (Cash)</button>
+                    <a id="whatsappBtn" href="#" target="_blank" style="display:block; text-align:center; margin-top:10px; color:#25D366; text-decoration:none;">
+                        <i class="fab fa-whatsapp"></i> Quick WhatsApp Order
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        let cart = [];
+        let allProducts = [];
+
+        async function loadProducts() {
+            const res = await fetch('http://localhost:3000/api/products');
+            allProducts = await res.json();
+            renderProducts(allProducts);
+        }
+
+        function renderProducts(list) {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = list.map(p => `
+                <div class="card" onclick="addToCart(${p.id})">
+                    <strong>${p.name}</strong><br>
+                    <small>Stock: ${p.stock_quantity}</small><br>
+                    <span style="color:var(--primary)">ZMW ${p.selling_price}</span>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(id) {
+            const product = allProducts.find(p => p.id === id);
+            const existing = cart.find(item => item.id === id);
+            if(existing) {
+                existing.qty++;
+            } else {
+                cart.push({...product, qty: 1});
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cartItems');
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                total += item.selling_price * item.qty;
+                return `<div>${item.name} x ${item.qty} - ZMW ${item.selling_price * item.qty}</div>`;
+            }).join('');
+            document.getElementById('cartTotal').innerText = total.toFixed(2);
+            
+            // Update WhatsApp link
+            const msg = encodeURIComponent(`New Order from MAKSAH: ${cart.map(i => i.name + ' x' + i.qty).join(', ')}. Total: ZMW ${total}`);
+            document.getElementById('whatsappBtn').href = `https://wa.me/260XXXXXXXXX?text=${msg}`;
+        }
+
+        async function processSale() {
+            if(cart.length === 0) return alert('Cart is empty');
+            
+            const saleData = {
+                items: cart,
+                total_amount: parseFloat(document.getElementById('cartTotal').innerText),
+                profit: cart.reduce((acc, item) => acc + ((item.selling_price - item.buying_price) * item.qty), 0),
+                cashier_id: 1 // Hardcoded for demo
+            };
+
+            const response = await fetch('http://localhost:3000/api/sales', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(saleData)
+            });
+
+            if(response.ok) {
+                alert('Sale Successful! Receipt Generated.');
+                window.print();
+                cart = [];
+                updateCartUI();
+                loadProducts();
+            }
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        loadProducts();
+    </script>
+</body>
+</html>

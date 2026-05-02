@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAKSAH - Inventory</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        #reader { width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+        .scanner-section { background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; }
+        .product-img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Usimamizi wa Stoo (Inventory)</h2>
+
+        <div class="scanner-section">
+            <h3 style="color: #4CAF50; margin-top: 0;">Scan Barcode</h3>
+            <div id="reader"></div>
+            <button onclick="startScanner()" style="background: #4CAF50; width: 100%;">Washa Kamera</button>
+        </div>
+
+        <div class="form-card">
+            <h3>Sajili Bidhaa Mpya</h3>
+            <input type="text" id="productName" placeholder="Jina la Bidhaa au Barcode">
+            <div class="row">
+                <input type="number" id="productStock" placeholder="Idadi">
+                <input type="number" id="productPrice" placeholder="Bei (ZMW)">
+            </div>
+            
+            <label>Picha ya Bidhaa:</label>
+            <input type="file" id="productImage" accept="image/*" style="margin-bottom: 15px;">
+            
+            <button onclick="saveProduct()" class="btn-save">Hifadhi Bidhaa</button>
+        </div>
+
+        <hr>
+        <input type="text" id="searchBar" placeholder="Tafuta bidhaa hapa..." onkeyup="searchProducts()">
+
+        <table id="inventoryTable">
+            <thead>
+                <tr>
+                    <th>Picha</th>
+                    <th>Jina la Bidhaa</th>
+                    <th>Stock</th>
+                    <th>Bei (ZMW)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="productContainer">
+                </tbody>
+        </table>
+        
+        <p id="dbError" style="color: #ff4444; display: none; text-align: center;">
+            Hitilafu: Imeshindwa kuunganisha na Database. Hakikisha Server imewashwa.
+        </p>
+    </div>
+
+    <script src="js/translations.js"></script>
+    <script src="js/inventory.js"></script>
+</body>
+</html>

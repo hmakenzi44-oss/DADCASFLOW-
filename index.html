@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>DADCAS BUSINESS</title>
 
 <style>
@@ -13,6 +14,7 @@ body {
   color: white;
 }
 
+/* Pages */
 .page {
   display: none;
   padding: 15px;
@@ -22,6 +24,7 @@ body {
   display: block;
 }
 
+/* Bottom Nav */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -39,6 +42,7 @@ body {
   font-weight: bold;
 }
 
+/* Cards */
 .card {
   background: #1e1e1e;
   padding: 15px;
@@ -46,6 +50,7 @@ body {
   border-radius: 10px;
 }
 
+/* More Menu */
 .more-menu {
   position: fixed;
   bottom: 60px;
@@ -77,6 +82,7 @@ body {
 <!-- DASHBOARD -->
 <div id="home" class="page active">
   <h2>Dashboard</h2>
+
   <div class="card">Today's Sales: <span id="todaySales">0</span></div>
   <div class="card">Today's Profit: <span id="todayProfit">0</span></div>
   <div class="card">Total Products: <span id="totalProducts">0</span></div>
@@ -84,15 +90,7 @@ body {
 </div>
 
 <!-- SALES -->
-<div {
-  id: 17123456789,
-  items: [
-    { name, quantity, sell_price, buy_price, total }
-  ],
-  total: 50000,
-  profit: 12000,
-  date: "2026-05-02T10:00:00"
-}
+<div id="sales" class="page">
   <h2>Sales</h2>
 
   <select id="productSelect"></select>
@@ -120,22 +118,12 @@ body {
   <button onclick="addProduct()">Add Product</button>
 
   <ul id="productList"></ul>
-  <!-- SALES HISTORY -->
-<div id="history" class="page">
-  <h2>Sales History</h2>
-
-  <input type="date" id="filterDate" onchange="renderSalesHistory()">
-
-  <ul id="salesList"></ul>
-
-  <h3>Total Sales: <span id="historyTotal">0</span></h3>
-  <h3>Total Profit: <span id="historyProfit">0</span></h3>
-</div>
 </div>
 
 <!-- MORE MENU -->
 <div id="moreMenu" class="more-menu hidden">
   <h3>More</h3>
+
   <button onclick="openReports()">Reports</button>
   <button onclick="openEmployees()">Employees</button>
   <button onclick="openBusiness()">Business</button>
@@ -148,36 +136,20 @@ body {
   <button onclick="showPage('home')">Home</button>
   <button onclick="showPage('sales')">Sales</button>
   <button onclick="showPage('stocks')">Stocks</button>
-  <button onclick="toggleMore()">More</button><div class="bottom-nav">
-  <button onclick="showPage('home')">Home</button>
-  <button onclick="showPage('sales')">Sales</button>
-  <button onclick="showPage('stocks')">Stocks</button>
-  <button onclick="showPage('history')">History</button>
   <button onclick="toggleMore()">More</button>
-  </div>
 </div>
 
 <script>
 
 /* DATA */
-let products = JSON.parse(localStorage.getItem("products")) || [];
-let sales = JSON.parse(localStorage.getItem("sales")) || [];
+let products = [];
+let sales = [];
 let cart = [];
-
-/* SAVE */
-function saveProducts() {
-  localStorage.setItem("products", JSON.stringify(products));
-}
-
-function saveSales() {
-  localStorage.setItem("sales", JSON.stringify(sales));
-}
 
 /* NAVIGATION */
 function showPage(page) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(page).classList.add("active");
-  document.getElementById("moreMenu").classList.add("hidden");
 }
 
 /* MORE MENU */
@@ -192,13 +164,8 @@ function openBusiness(){ alert("Business module"); }
 function openAdmin(){ alert("Admin panel"); }
 function openSubscriptions(){ alert("Subscriptions"); }
 
-/* ADD PRODUCT */
+/* PRODUCTS */
 function addProduct() {
-  if (!pname.value || buy.value <= 0 || sell.value <= 0 || qty.value <= 0) {
-    alert("Invalid input");
-    return;
-  }
-
   let product = {
     id: Date.now(),
     name: pname.value,
@@ -208,15 +175,12 @@ function addProduct() {
   };
 
   products.push(product);
-  saveProducts();
-
   renderProducts();
   renderDropdown();
   updateDashboard();
 }
 
-/* RENDER PRODUCTS */
-function renderProducts() {
+/* RENDER PRODUCTS */function renderProducts() {
   let list = document.getElementById("productList");
   list.innerHTML = "";
 
@@ -230,39 +194,7 @@ function renderProducts() {
     `;
   });
 }
-  function deleteProduct(id) {
-  if (!confirm("Delete this product?")) return;
 
-  products = products.filter(p => p.id !== id);
-
-  saveProducts();
-  renderProducts();
-  renderDropdown();
-  updateDashboard();
-  }
-  function editProduct(id) {
-  let product = products.find(p => p.id === id);
-
-  let newName = prompt("Product Name", product.name);
-  let newBuy = prompt("Buy Price", product.buy_price);
-  let newSell = prompt("Sell Price", product.sell_price);
-  let newQty = prompt("Quantity", product.quantity);
-
-  if (!newName || newBuy <= 0 || newSell <= 0 || newQty < 0) {
-    alert("Invalid input");
-    return;
-  }
-
-  product.name = newName;
-  product.buy_price = Number(newBuy);
-  product.sell_price = Number(newSell);
-  product.quantity = Number(newQty);
-
-  saveProducts();
-  renderProducts();
-  renderDropdown();
-  updateDashboard();
-  }
 
 /* DROPDOWN */
 function renderDropdown() {
@@ -273,65 +205,18 @@ function renderDropdown() {
     select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
   });
 }
-function renderSalesHistory() {
-  let list = document.getElementById("salesList");
-  list.innerHTML = "";
 
-  let filterDate = document.getElementById("filterDate").value;
-
-  let total = 0;
-  let profit = 0;
-
-  sales.forEach(t => {
-
-    let saleDate = new Date(t.date).toISOString().split("T")[0];
-
-    if (!filterDate || saleDate === filterDate) {
-
-      total += t.total;
-      profit += t.profit;
-
-      let itemsHTML = "";
-
-      t.items.forEach(i => {
-        itemsHTML += `${i.name} x${i.quantity} = ${i.total}<br>`;
-      });
-
-      list.innerHTML += `
-        <li>
-          <b>Receipt #${t.id}</b><br>
-          ${itemsHTML}
-          Total: ${t.total}<br>
-          Profit: ${t.profit}<br>
-          Date: ${saleDate}
-        </li>
-      `;
-    }
-  });
-
-  document.getElementById("historyTotal").innerText = total;
-  document.getElementById("historyProfit").innerText = profit;
-}
-
-/* ADD TO CART */
+/* CART */
 function addToCart() {
-  let productId = Number(productSelect.value);
-  let qty = Number(quantity.value);
+  let id = Number(productSelect.value);
+  let qtyVal = Number(quantity.value);
 
-  let product = products.find(p => p.id === productId);
-
-  if (!product || qty <= 0 || qty > product.quantity) {
-    alert("Invalid quantity");
-    return;
-  }
+  let product = products.find(p => p.id === id);
 
   let item = {
-    id: product.id,
-    name: product.name,
-    quantity: qty,
-    sell_price: product.sell_price,
-    buy_price: product.buy_price,
-    total: product.sell_price * qty
+    ...product,
+    quantity: qtyVal,
+    total: product.sell_price * qtyVal
   };
 
   cart.push(item);
@@ -355,53 +240,39 @@ function renderCart() {
 
 /* COMPLETE SALE */
 function completeSale() {
-  if (cart.length === 0) {
-    alert("Cart is empty");
-    return;
-  }
-
-  let total = 0;
-  let profit = 0;
-
   cart.forEach(item => {
-    total += item.total;
-    profit += (item.sell_price - item.buy_price) * item.quantity;
+
+    let profit = (item.sell_price - item.buy_price) * item.quantity;
+
+    sales.push({
+      ...item,
+      profit: profit,
+      date: new Date()
+    });
 
     let product = products.find(p => p.id === item.id);
     product.quantity -= item.quantity;
+
   });
-
-  let transaction = {
-    id: Date.now(),
-    items: [...cart],
-    total: total,
-    profit: profit,
-    date: new Date()
-  };
-
-  sales.push(transaction);
-
-  saveSales();
-  saveProducts();
 
   cart = [];
   renderCart();
   renderProducts();
   updateDashboard();
-  renderSalesHistory();
 }
 
 /* DASHBOARD */
 function updateDashboard() {
+
   let today = new Date().toDateString();
 
   let todaySales = 0;
   let todayProfit = 0;
 
-  sales.forEach(t => {
-    if (new Date(t.date).toDateString() === today) {
-      todaySales += t.total;
-      todayProfit += t.profit;
+  sales.forEach(s => {
+    if (new Date(s.date).toDateString() === today) {
+      todaySales += s.total;
+      todayProfit += s.profit;
     }
   });
 
@@ -411,11 +282,6 @@ function updateDashboard() {
   document.getElementById("lowStock").innerText =
     products.filter(p => p.quantity < 5).length;
 }
-/* INIT */
-renderProducts();
-renderDropdown();
-updateDashboard();
-  renderSalesHistory();
 
 </script>
 

@@ -1,0 +1,55 @@
+/* Font na Reset */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    -webkit-tap-highlight-color: transparent; /* Huondoa rangi ya blue unapobonyeza button */
+    user-select: none; /* Inazuia maandishi kuchaguliwa hovyo */
+    overflow-x: hidden;
+}
+
+/* Glassmorphism Effect kwa Nav */
+nav {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+/* Card Styling */
+.card-pos {
+    transition: transform 0.1s ease-in-out;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card-pos:active {
+    transform: scale(0.98); /* Inatoa feedback unapobonyeza card */
+}
+
+/* Floating Action Button (FAB) Style */
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 4px;
+}
+::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Input Fields */
+input, select {
+    font-size: 16px !important; /* Inazuia iOS zoom-in wakati wa kuandika */
+}
